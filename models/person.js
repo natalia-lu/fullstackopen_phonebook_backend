@@ -6,7 +6,7 @@ const url = process.env.MONGODB_URI
 console.log('connecting to', url)
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {
@@ -14,19 +14,19 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   })
 
 const personSchema = new mongoose.Schema({
-  name: { 
+  name: {
     type: String,
-	required: true,
+    required: true,
     unique: true,
-    minLength: 3 
+    minLength: 3
   },
   number: {
-	type: String,
-	required: true,
-	validate: {
+    type: String,
+    required: true,
+    validate: {
       validator: function(v) {
-	    const only_digits = v.replace(/\D+/g, '')  
-        return /\d{8,}/.test(only_digits);
+        const only_digits = v.replace(/\D+/g, '')
+        return /\d{8,}/.test(only_digits)
       },
       message: props => `${props.value} should have at least 8 digits`
     }
@@ -34,13 +34,13 @@ const personSchema = new mongoose.Schema({
 })
 
 personSchema.plugin(uniqueValidator)
-  
+
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
   }
-})  
+})
 
-module.exports = mongoose.model('Person', personSchema)  
+module.exports = mongoose.model('Person', personSchema)

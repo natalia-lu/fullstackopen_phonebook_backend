@@ -12,60 +12,60 @@ app.use(express.static('build'))
 
 app.use(express.json())
 
-morgan.token('post-body', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('post-body', function (req) { return JSON.stringify(req.body) })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
-app.get("/api/persons", (request, response) => {
+app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-	response.json(persons)  
-  })	
+    response.json(persons)
+  })
 })
 
-app.get("/info", (request, response) => {
+app.get('/info', (request, response) => {
   const date = new Date()
   Person.find({}).then(persons => {
-	response.send(`<div>Phonebook has info for ${persons.length} people</div> 
-				 <div style="margin-top: 10px;">${date}</div>`)  
-  })	
+    response.send(`<div>Phonebook has info for ${persons.length} people</div> 
+				 <div style="margin-top: 10px;">${date}</div>`)
+  })
 })
 
-app.get("/api/persons/:id", (request, response, next) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id).then(person => {
-	if (person) {  
-	  response.json(person)
-	} else {
-	  response.status(404).end()
-    }		
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
   })
-  .catch(error => next(error))  
+    .catch(error => next(error))
 })
 
-app.delete("/api/persons/:id", (request, response, next) => {
-  Person.findByIdAndRemove(request.params.id).then(result => {
-	response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id).then(() => {
+    response.status(204).end()
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
-app.post("/api/persons", (request, response, next) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
-  
+
   const newContact = new Person({
-	name: body.name,
-	number: body.number
+    name: body.name,
+    number: body.number
   })
   newContact.save()
     .then(savedPerson => {
-	  response.json(savedPerson.toJSON())  
+      response.json(savedPerson.toJSON())
     })
-   .catch(error => next(error))   
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
 
-  Person.findByIdAndUpdate(request.params.id, {number: body.number}, { new: true, runValidators: true })
+  Person.findByIdAndUpdate(request.params.id, { number: body.number }, { new: true, runValidators: true })
     .then(updatedContact => {
       response.json(updatedContact)
     })
